@@ -1,8 +1,7 @@
 #pragma once
 
-#include "gw2DatTools/exception/Exception.h"
-
 #include <cstdint>
+#include <cassert>
 
 namespace gw2::compression
 {
@@ -47,10 +46,7 @@ void readCode(const HuffmanTree& iHuffmanTree, State& ioState, uint16_t& ioCode)
 inline void pullByte(State& ioState)
 {
     // checking that we have less than 32 bits available
-    if (ioState.bits >= 32)
-    {
-        throw exception::Exception("Tried to pull a value while we still have 32 bits available.");
-    }
+    assert(ioState.bits < 32 && "Tried to pull a value while we still have 32 bits available.");
 
     // skip the last element of all 65536 bytes blocks
     if ((ioState.inputPos + 1) % (0x4000) == 0)
@@ -64,16 +60,10 @@ inline void pullByte(State& ioState)
     // checking that inputPos is not out of bounds
     if (ioState.inputPos >= ioState.inputSize)
     {
-        if (ioState.isEmpty)
-        {
-            throw exception::Exception("Reached end of input while trying to fetch a new byte.");
-        }
-        else
-        {
-            ioState.isEmpty = true;
-        }
+        assert(!ioState.isEmpty && "Reached end of input while trying to fetch a new byte.");
+        ioState.isEmpty = true;
     }
-    else
+    else        
     {
         aValue = ioState.input[ioState.inputPos];
     }
@@ -98,10 +88,7 @@ inline void pullByte(State& ioState)
 inline void needBits(State& ioState, const uint8_t iBits)
 {
     // checking that we request at most 32 bits
-    if (iBits > 32)
-    {
-        throw exception::Exception("Tried to need more than 32 bits.");
-    }
+    assert(iBits <= 32 && "Tried to need more than 32 bits.");
 
     if (ioState.bits < iBits)
     {
@@ -112,15 +99,9 @@ inline void needBits(State& ioState, const uint8_t iBits)
 inline void dropBits(State& ioState, const uint8_t iBits)
 {
     // checking that we request at most 32 bits
-    if (iBits > 32)
-    {
-        throw exception::Exception("Tried to drop more than 32 bits.");
-    }
+    assert(iBits <= 32 && "Tried to drop more than 32 bits.");    
 
-    if (iBits > ioState.bits)
-    {
-        throw exception::Exception("Tried to drop more bits than we have.");
-    }
+    assert(iBits <= ioState.bits && "Tried to drop more bits than we have.");    
 
     // Updating the values to drop the bits
     if (iBits == 32)

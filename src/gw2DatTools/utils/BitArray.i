@@ -1,7 +1,5 @@
 #pragma once
 
-#include "gw2DatTools/exception/Exception.h"
-
 #include <cassert>
 
 namespace gw2::utils
@@ -58,14 +56,8 @@ template <typename IntType>
 template <typename OutputType>
 void BitArray<IntType>::readLazy(uint8_t iBitNumber, OutputType& oValue) const
 {
-    if (iBitNumber > sizeof(OutputType) * 8)
-    {
-        throw exception::Exception("Invalid number of bits requested.");
-    }
-    if (iBitNumber > sizeof(IntType) * 8)
-    {
-        throw exception::Exception("Invalid number of bits requested.");
-    }
+    assert((iBitNumber <= sizeof(OutputType) * 8) && "Invalid number of bits requested.");
+    assert((iBitNumber <= sizeof(IntType) * 8) && "Invalid number of bits requested.");
     
     readImpl(iBitNumber, oValue);
 }
@@ -91,10 +83,7 @@ template <typename IntType>
 template <typename OutputType>
 void BitArray<IntType>::read(uint8_t iBitNumber, OutputType& oValue) const
 {
-    if (_bitsAvail < iBitNumber)
-    {
-        throw exception::Exception("Not enough bits available to read the value.");
-    }
+    assert(_bitsAvail >= iBitNumber && "Not enough bits available to read the value.");
     readLazy(iBitNumber, oValue);
 }
 
@@ -102,10 +91,7 @@ template <typename IntType>
 template <uint8_t isBitNumber, typename OutputType>
 void BitArray<IntType>::read(OutputType& oValue) const
 {
-    if (_bitsAvail < isBitNumber)
-    {
-        throw exception::Exception("Not enough bits available to read the value.");
-    }
+    assert(_bitsAvail >= isBitNumber && "Not enough bits available to read the value.");
     readLazy<isBitNumber>(oValue);
 }
 
@@ -119,10 +105,7 @@ void BitArray<IntType>::read(OutputType& oValue) const
 template <typename IntType>
 void BitArray<IntType>::dropImpl(uint8_t iBitNumber)
 {
-    if (_bitsAvail < iBitNumber)
-    {
-        throw exception::Exception("Too much bits were asked to be dropped.");
-    }
+    assert(_bitsAvail >= iBitNumber && "Too much bits were asked to be dropped.");
     
     uint8_t aNewBitsAvail = _bitsAvail - iBitNumber;
     if (aNewBitsAvail >= sizeof(IntType) * 8)
@@ -165,10 +148,7 @@ void BitArray<IntType>::dropImpl(uint8_t iBitNumber)
 template <typename IntType>
 void BitArray<IntType>::drop(uint8_t iBitNumber)
 {
-    if (iBitNumber > sizeof(IntType) * 8)
-    {
-        throw exception::Exception("Invalid number of bits to be dropped.");
-    }
+    assert((iBitNumber <= sizeof(IntType) * 8) && "Invalid number of bits to be dropped.");
     dropImpl(iBitNumber);
 }
 
@@ -186,6 +166,5 @@ void BitArray<IntType>::drop()
 {
     drop<sizeof(OutputType) * 8>();
 }
-
 
 }

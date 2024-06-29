@@ -2,17 +2,12 @@
 
 #include <memory.h>
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 
 void readCode(const HuffmanTree& iHuffmanTree, State& ioState, uint16_t& ioCode)
 {
-    if (iHuffmanTree.isEmpty)
-    {
-        throw exception::Exception("Trying to read code from an empty HuffmanTree.");
-    }
+    assert(!iHuffmanTree.isEmpty && "Trying to read code from an empty HuffmanTree.");
 
     needBits(ioState, 32);
 
@@ -122,15 +117,8 @@ void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int1
 void fillWorkingTabsHelper(const uint8_t iBits, const int16_t iSymbol, int16_t* ioWorkingBitTab, int16_t* ioWorkingCodeTab)
 {
     // checking out of bounds
-    if (iBits >= MaxCodeBitsLength)
-    {
-        throw exception::Exception("Too many bits.");
-    }
-
-    if (iSymbol >= MaxSymbolValue)
-    {
-        throw exception::Exception("Too high symbol.");
-    }
+    assert(iBits < MaxCodeBitsLength && "Too many bits.");    
+    assert(iSymbol < MaxSymbolValue && "Too high symbol.");
 
     if (ioWorkingBitTab[iBits] == -1)
     {
@@ -143,5 +131,4 @@ void fillWorkingTabsHelper(const uint8_t iBits, const int16_t iSymbol, int16_t* 
     }
 }
 
-}
 }

@@ -3,8 +3,6 @@
 #include <memory.h>
 #include <iostream>
 
-#include "gw2DatTools/exception/Exception.h"
-
 #include "HuffmanTree.h"
 #include "../utils/BitArray.h"
 
@@ -33,7 +31,7 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
 
     if (aNumberOfSymbols > sDatFileMaxSymbolValue)
     {
-        throw exception::Exception("Too many symbols to decode.");
+        throw std::exception("Too many symbols to decode.");
     }
 
     ioHuffmanTreeBuilder.clear();
@@ -140,7 +138,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             }
             else
             {
-                throw exception::Exception("Invalid value for writeSize code.");
+                throw std::exception("Invalid value for writeSize code.");
             }
 
             //additional bits
@@ -171,7 +169,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             }
             else
             {
-                throw exception::Exception("Invalid value for writeOffset code.");
+                throw std::exception("Invalid value for writeOffset code.");
             }
 
             //additional bits
@@ -202,12 +200,12 @@ uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  ui
 {
     if (iInputTab == nullptr)
     {
-        throw exception::Exception("Input buffer is null.");
+        throw std::exception("Input buffer is null.");
     }
 
     if (ioOutputTab != nullptr && ioOutputSize == 0)
     {
-        throw exception::Exception("Output buffer is not null and outputSize is not defined.");
+        throw std::exception("Output buffer is not null and outputSize is not defined.");
     }
 
     uint8_t* anOutputTab(nullptr);
@@ -245,14 +243,6 @@ uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  ui
         dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
 
         return anOutputTab;
-    }
-    catch(exception::Exception& iException)
-    {
-        if (isOutputTabOwned)
-        {
-            free(anOutputTab);
-        }
-        throw iException; // Rethrow exception
     }
     catch(std::exception& iException)
     {

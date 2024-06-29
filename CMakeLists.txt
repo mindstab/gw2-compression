@@ -4,7 +4,6 @@ project(gw2-compression LANGUAGES CXX)
 SET(INCLUDES
     include/gw2DatTools/compression/inflateDatFileBuffer.h
     include/gw2DatTools/compression/inflateTextureFileBuffer.h
-    include/gw2DatTools/exception/Exception.h
 )
 
 SET(SOURCES
@@ -14,7 +13,6 @@ SET(SOURCES
     src/gw2DatTools/compression/huffmanTreeUtils.h
     src/gw2DatTools/compression/inflateDatFileBuffer.cpp
     src/gw2DatTools/compression/inflateTextureFileBuffer.cpp
-    src/gw2DatTools/exception/Exception.cpp
     src/gw2DatTools/utils/BitArray.h
     src/gw2DatTools/utils/BitArray.i
 )

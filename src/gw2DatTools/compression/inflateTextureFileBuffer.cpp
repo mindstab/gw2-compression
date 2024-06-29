@@ -2,12 +2,11 @@
 
 #include <memory.h>
 
-#include "gw2DatTools/exception/Exception.h"
-
 #include "huffmanTreeUtils.h"
 
 #include <iostream>
 #include <vector>
+#include <utility>
 
 namespace gw2::compression
 {
@@ -148,10 +147,8 @@ Format deduceFormat(uint32_t iFourCC)
 
     case 0x58434433: // 3DCX
         return sFormats[8];
-
-    default:
-        throw exception::Exception("Unknown format.");
     }
+    std::unreachable();
 }
 
 void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, uint8_t* ioOutputTab)
@@ -641,12 +638,12 @@ uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,
 {
     if (iInputTab == nullptr)
     {
-        throw exception::Exception("Input buffer is null.");
+        throw std::exception("Input buffer is null.");
     }
 
     if (ioOutputTab != nullptr && ioOutputSize == 0)
     {
-        throw exception::Exception("Output buffer is not null and outputSize is not defined.");
+        throw std::exception("Output buffer is not null and outputSize is not defined.");
     }
 
     uint8_t* anOutputTab(nullptr);
@@ -704,7 +701,7 @@ uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,
 
         if (ioOutputSize != 0 && ioOutputSize < anOutputSize)
         {
-            throw exception::Exception("Output buffer is too small.");
+            throw std::exception("Output buffer is too small.");
         }
 
         ioOutputSize = anOutputSize;
@@ -723,14 +720,6 @@ uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,
 
         return anOutputTab;
     }
-    catch(exception::Exception& iException)
-    {
-        if (isOutputTabOwned)
-        {
-            free(anOutputTab);
-        }
-        throw iException; // Rethrow exception
-    }
     catch(std::exception& iException)
     {
         if (isOutputTabOwned)
@@ -746,12 +735,12 @@ uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t i
 {
     if (iInputTab == nullptr)
     {
-        throw exception::Exception("Input buffer is null.");
+        throw std::exception("Input buffer is null.");
     }
 
     if (ioOutputTab != nullptr && ioOutputSize == 0)
     {
-        throw exception::Exception("Output buffer is not null and outputSize is not defined.");
+        throw std::exception("Output buffer is not null and outputSize is not defined.");
     }
 
     uint8_t* anOutputTab(nullptr);
@@ -797,7 +786,7 @@ uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t i
 
         if (ioOutputSize != 0 && ioOutputSize < anOutputSize)
         {
-            throw exception::Exception("Output buffer is too small.");
+            throw std::exception("Output buffer is too small.");
         }
 
         ioOutputSize = anOutputSize;
@@ -815,14 +804,6 @@ uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t i
         texture::inflateData(aState, aFullFormat, ioOutputSize, anOutputTab);
 
         return anOutputTab;
-    }
-    catch(exception::Exception& iException)
-    {
-        if (isOutputTabOwned)
-        {
-            free(anOutputTab);
-        }
-        throw iException; // Rethrow exception
     }
     catch(std::exception& iException)
     {
