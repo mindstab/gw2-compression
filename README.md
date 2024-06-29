@@ -1,3 +1,13 @@
+gw2-compression
+===========
+
+Guild Wars 2 decompression library. Based on the work done by [Antoine Hom](https://github.com/ahom) and their [gw2_reverse](https://github.com/ahom/gw2_reverse) library.
+
+All non compression related code has been stripped from this fork.
+
+---
+## ORGINAL README:
+
 gw2_reverse
 ===========
 
