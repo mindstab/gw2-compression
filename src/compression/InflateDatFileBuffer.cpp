@@ -196,31 +196,25 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  s
 }
 }
 
-std::uint32_t inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
+Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
 {
     uint8_t* anOutputTab(nullptr);
-    try
-    {
-        dat::DatFileBitArray anInputBitArray(iInputTab, 16384); // Skipping four bytes every 65k chunk
 
-        // Skipping header & Getting size of the uncompressed data
-        anInputBitArray.drop<std::uint32_t>();
+    dat::DatFileBitArray anInputBitArray(iInputTab, 16384); // Skipping four bytes every 65k chunk
 
-        // Getting size of the uncompressed data
-        uint32_t anOutputSize;
-        anInputBitArray.read(anOutputSize);
-        anInputBitArray.drop<std::uint32_t>();
-        assert(anOutputSize <= ioOutputTab.size());
+    // Skipping header & Getting size of the uncompressed data
+    anInputBitArray.drop<std::uint32_t>();
 
-        anOutputTab = (uint8_t*)ioOutputTab.data();
+    // Getting size of the uncompressed data
+    uint32_t anOutputSize;
+    anInputBitArray.read(anOutputSize);
+    anInputBitArray.drop<std::uint32_t>();
+    assert(anOutputSize <= ioOutputTab.size());
 
-        dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
-        return anOutputSize;
-    }
-    catch(std::exception& iException)
-    {
-        throw iException; // Rethrow exception
-    }
+    anOutputTab = (uint8_t*)ioOutputTab.data();
+
+    dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
+    return anOutputSize;
 }
 
 class DatFileHuffmanTreeDictStaticInitializer

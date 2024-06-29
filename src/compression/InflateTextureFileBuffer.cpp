@@ -633,55 +633,48 @@ void inflateData(State& iState, const FullFormat& iFullFormat, std::uint32_t ioO
 }
 }
 
-std::uint32_t inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
+Result<std::uint32_t> inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
 {
     uint8_t* anOutputTab(nullptr);
 
-    try
+    if (!texture::sStaticValuesInitialized)
     {
-        if (!texture::sStaticValuesInitialized)
-        {
-            texture::initializeStaticValues();
-            texture::sStaticValuesInitialized = true;
-        }
-
-        // Initialize format
-        texture::FullFormat aFullFormat;
-
-        aFullFormat.format = texture::deduceFormat(iFormatFourCc);
-        aFullFormat.width  = iWidth;
-        aFullFormat.height = iHeight;
-
-        aFullFormat.nbObPixelBlocks = ((aFullFormat.width + 3) / 4) * ((aFullFormat.height + 3) / 4);
-        aFullFormat.bytesPerPixelBlock = (aFullFormat.format.pixelSizeInBits * 4 * 4) / 8;
-        aFullFormat.hasTwoComponents =
-            ((aFullFormat.format.flags & (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA)) == (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA))
-            || (aFullFormat.format.flags & texture::FF_BICOLORCOMP);
-
-        aFullFormat.bytesPerComponent = aFullFormat.bytesPerPixelBlock / (aFullFormat.hasTwoComponents ? 2 : 1);
-
-        // Initialize state
-        State aState;
-        aState.input = std::bit_cast<const std::uint32_t*>(iInputTab.data());
-        aState.inputSize = iInputTab.size() / 4;
-        aState.inputPos = 0;
-
-        aState.head = 0;
-        aState.bits = 0;
-        aState.buffer = 0;
-
-        aState.isEmpty = false;
-
-        std::uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
-        anOutputTab = (uint8_t*)ioOutputTab.data();        
-
-        texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);
-        return anOutputSize;
+        texture::initializeStaticValues();
+        texture::sStaticValuesInitialized = true;
     }
-    catch(std::exception& iException)
-    {
-        throw iException; // Rethrow exception
-    }
+
+    // Initialize format
+    texture::FullFormat aFullFormat;
+
+    aFullFormat.format = texture::deduceFormat(iFormatFourCc);
+    aFullFormat.width  = iWidth;
+    aFullFormat.height = iHeight;
+
+    aFullFormat.nbObPixelBlocks = ((aFullFormat.width + 3) / 4) * ((aFullFormat.height + 3) / 4);
+    aFullFormat.bytesPerPixelBlock = (aFullFormat.format.pixelSizeInBits * 4 * 4) / 8;
+    aFullFormat.hasTwoComponents =
+        ((aFullFormat.format.flags & (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA)) == (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA))
+        || (aFullFormat.format.flags & texture::FF_BICOLORCOMP);
+
+    aFullFormat.bytesPerComponent = aFullFormat.bytesPerPixelBlock / (aFullFormat.hasTwoComponents ? 2 : 1);
+
+    // Initialize state
+    State aState;
+    aState.input = std::bit_cast<const std::uint32_t*>(iInputTab.data());
+    aState.inputSize = iInputTab.size() / 4;
+    aState.inputPos = 0;
+
+    aState.head = 0;
+    aState.bits = 0;
+    aState.buffer = 0;
+
+    aState.isEmpty = false;
+
+    std::uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
+    anOutputTab = (uint8_t*)ioOutputTab.data();        
+
+    texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);
+    return anOutputSize;   
 }
 
 }

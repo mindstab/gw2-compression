@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(gw2-compression LANGUAGES CXX)
 
 SET(INCLUDES
+    include/compression/Error.hpp
     include/compression/InflateDatFileBuffer.hpp
     include/compression/InflateTextureFileBuffer.hpp
 )

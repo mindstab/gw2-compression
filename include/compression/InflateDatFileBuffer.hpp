@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <span>
 
+#include "Error.hpp"
+
 namespace gw2::compression
 {
 
@@ -21,6 +23,6 @@ namespace gw2::compression
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-std::uint32_t inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab);
+Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab);
 
 }
