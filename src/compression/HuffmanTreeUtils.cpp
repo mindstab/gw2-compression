@@ -1,4 +1,4 @@
-#include "huffmanTreeUtils.h"
+#include "HuffmanTreeUtils.hpp"
 
 #include <memory.h>
 

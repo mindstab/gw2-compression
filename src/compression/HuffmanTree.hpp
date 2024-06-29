@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <concepts>
 
-#include "../utils/BitArray.h"
+#include "BitArray.hpp"
 
 namespace gw2::compression {
 

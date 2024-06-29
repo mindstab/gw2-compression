@@ -2,17 +2,17 @@ cmake_minimum_required(VERSION 3.20)
 project(gw2-compression LANGUAGES CXX)
 
 SET(INCLUDES
-    include/gw2DatTools/compression/inflateDatFileBuffer.h
-    include/gw2DatTools/compression/inflateTextureFileBuffer.h
+    include/compression/InflateDatFileBuffer.hpp
+    include/compression/InflateTextureFileBuffer.hpp
 )
 
 SET(SOURCES
-    src/gw2DatTools/compression/HuffmanTree.h
-    src/gw2DatTools/compression/huffmanTreeUtils.cpp
-    src/gw2DatTools/compression/huffmanTreeUtils.h
-    src/gw2DatTools/compression/inflateDatFileBuffer.cpp
-    src/gw2DatTools/compression/inflateTextureFileBuffer.cpp
-    src/gw2DatTools/utils/BitArray.h
+    src/compression/HuffmanTree.hpp
+    src/compression/HuffmanTreeUtils.cpp
+    src/compression/HuffmanTreeUtils.hpp
+    src/compression/InflateDatFileBuffer.cpp
+    src/compression/InflateTextureFileBuffer.cpp
+    src/utils/BitArray.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${INCLUDES} ${SOURCES})

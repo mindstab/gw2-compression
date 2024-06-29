@@ -1,10 +1,10 @@
-#include "gw2DatTools/compression/inflateDatFileBuffer.h"
+#include "compression/InflateDatFileBuffer.hpp"
 
 #include <memory.h>
 #include <iostream>
 
-#include "HuffmanTree.h"
-#include "../utils/BitArray.h"
+#include "HuffmanTree.hpp"
+#include "BitArray.hpp"
 
 namespace gw2::compression
 {

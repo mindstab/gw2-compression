@@ -1,8 +1,8 @@
-#include "gw2DatTools/compression/inflateTextureFileBuffer.h"
+#include "compression/InflateTextureFileBuffer.hpp"
 
 #include <memory.h>
 
-#include "huffmanTreeUtils.h"
+#include "HuffmanTreeUtils.hpp"
 
 #include <iostream>
 #include <vector>
