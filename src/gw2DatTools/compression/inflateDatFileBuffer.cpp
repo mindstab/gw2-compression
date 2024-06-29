@@ -200,7 +200,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
 }
 }
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
+uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
 {
     if (iInputTab == nullptr)
     {

@@ -3,14 +3,12 @@
 
 #include <exception>
 
-#include "gw2DatTools/dllMacros.h"
-
 namespace gw2dt
 {
 namespace exception
 {
 
-class GW2DATTOOLS_API Exception: public std::exception
+class Exception: public std::exception
 {
 public:
     Exception(const char* iReason);

@@ -639,7 +639,7 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
 }
 }
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
+uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
 {
     if (iInputTab == nullptr)
     {
@@ -743,7 +743,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(uint32_t 
     }
 }
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
+uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
         uint32_t& ioOutputSize, uint8_t* ioOutputTab)
 {
     if (iInputTab == nullptr)

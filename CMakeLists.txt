@@ -5,7 +5,6 @@ SET(INCLUDES
     include/gw2DatTools/compression/inflateDatFileBuffer.h
     include/gw2DatTools/compression/inflateTextureFileBuffer.h
     include/gw2DatTools/exception/Exception.h
-    include/gw2DatTools/dllMacros.h
 )
 
 SET(SOURCES

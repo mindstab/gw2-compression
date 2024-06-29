@@ -4,8 +4,6 @@
 #include <cstdint>
 #include <string>
 
-#include "gw2DatTools/dllMacros.h"
-
 namespace gw2dt
 {
 namespace compression
@@ -26,7 +24,7 @@ namespace compression
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
+uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 
 /** @Inputs:
  *    - iWidth: Width of the texture
@@ -46,7 +44,7 @@ GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureFileBuffer(uint32_t 
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
+uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
         uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 }
 }

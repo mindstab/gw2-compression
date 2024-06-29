@@ -4,8 +4,6 @@
 #include <cstdint>
 #include <string>
 
-#include "gw2DatTools/dllMacros.h"
-
 namespace gw2dt
 {
 namespace compression
@@ -26,7 +24,7 @@ namespace compression
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
 
-GW2DATTOOLS_API uint8_t* GW2DATTOOLS_APIENTRY inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
+uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 
 }
 }
