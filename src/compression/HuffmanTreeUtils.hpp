@@ -6,41 +6,37 @@
 namespace gw2::compression
 {
 
-static const uint32_t MaxCodeBitsLength = 32; // Max number of bits per code
-static const uint32_t MaxSymbolValue = 285;   // Max value for a symbol
-static const uint32_t MaxNbBitsHash = 8;
+static constexpr std::uint32_t MaxCodeBitsLength = 32; // Max number of bits per code
+static constexpr std::uint32_t MaxSymbolValue = 285;   // Max value for a symbol
+static constexpr std::uint32_t MaxNbBitsHash = 8;
 
 struct HuffmanTree
 {
-    uint32_t codeCompTab[MaxCodeBitsLength];
-    uint16_t symbolValueTabOffsetTab[MaxCodeBitsLength];
-    uint16_t symbolValueTab[MaxSymbolValue];
-    uint8_t codeBitsTab[MaxCodeBitsLength];
-
-    int16_t symbolValueHashTab[1 << MaxNbBitsHash];
-    uint8_t codeBitsHashTab[1 << MaxNbBitsHash];
-
+    std::uint32_t codeCompTab[MaxCodeBitsLength];
+    std::uint16_t symbolValueTabOffsetTab[MaxCodeBitsLength];
+    std::uint16_t symbolValueTab[MaxSymbolValue];
+    std::uint8_t codeBitsTab[MaxCodeBitsLength];
+    std::int16_t symbolValueHashTab[1 << MaxNbBitsHash];
+    std::uint8_t codeBitsHashTab[1 << MaxNbBitsHash];
     bool isEmpty;
 };
 
 struct State
 {
-    const uint32_t* input;
-    uint32_t inputSize;
-    uint32_t inputPos;
-
-    uint32_t head;
-    uint32_t buffer;
-    uint8_t bits;
-
+    const std::uint32_t* input;
+    std::uint32_t inputSize;
+    std::uint32_t inputPos;
+    std::uint32_t head;
+    std::uint32_t buffer;
+    std::uint8_t bits;
     bool isEmpty;
 };
 
-void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int16_t* ioWorkingCodeTab);
-void fillWorkingTabsHelper(const uint8_t iBits, const int16_t iSymbol, int16_t* ioWorkingBitTab, int16_t* ioWorkingCodeTab);
+void buildHuffmanTree(HuffmanTree& ioHuffmanTree, std::int16_t* ioWorkingBitTab, std::int16_t* ioWorkingCodeTab);
+void fillWorkingTabsHelper(const std::uint8_t iBits, const std::int16_t iSymbol, std::int16_t* ioWorkingBitTab, std::int16_t* ioWorkingCodeTab);
 
 // Read the next code
-void readCode(const HuffmanTree& iHuffmanTree, State& ioState, uint16_t& ioCode);
+void readCode(const HuffmanTree& iHuffmanTree, State& ioState, std::uint16_t& ioCode);
 
 // Bits manipulation
 inline void pullByte(State& ioState)
@@ -55,7 +51,7 @@ inline void pullByte(State& ioState)
     }
 
     // Fetching the next value
-    uint32_t aValue = 0;
+    std::uint32_t aValue = 0;
 
     // checking that inputPos is not out of bounds
     if (ioState.inputPos >= ioState.inputSize)
@@ -85,7 +81,7 @@ inline void pullByte(State& ioState)
     ++(ioState.inputPos);
 }
 
-inline void needBits(State& ioState, const uint8_t iBits)
+inline void needBits(State& ioState, const std::uint8_t iBits)
 {
     // checking that we request at most 32 bits
     assert(iBits <= 32 && "Tried to need more than 32 bits.");
@@ -96,7 +92,7 @@ inline void needBits(State& ioState, const uint8_t iBits)
     }
 }
 
-inline void dropBits(State& ioState, const uint8_t iBits)
+inline void dropBits(State& ioState, const std::uint8_t iBits)
 {
     // checking that we request at most 32 bits
     assert(iBits <= 32 && "Tried to drop more than 32 bits.");    
@@ -120,7 +116,7 @@ inline void dropBits(State& ioState, const uint8_t iBits)
     ioState.bits -= iBits;
 }
 
-inline uint32_t readBits(const State& iState, const uint8_t iBits)
+inline std::uint32_t readBits(const State& iState, const std::uint8_t iBits)
 {
     return (iState.head) >> (32 - iBits);
 }

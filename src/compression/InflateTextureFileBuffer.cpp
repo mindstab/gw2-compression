@@ -4,9 +4,9 @@
 
 #include "HuffmanTreeUtils.hpp"
 
-#include <iostream>
 #include <vector>
 #include <utility>
+#include <bit>
 
 namespace gw2::compression
 {
@@ -15,20 +15,19 @@ namespace texture
 
 struct Format
 {
-    uint16_t flags;
-    uint16_t pixelSizeInBits;
+    std::uint16_t flags;
+    std::uint16_t pixelSizeInBits;
 };
 
 struct FullFormat
 {
     Format format;
-    uint32_t nbObPixelBlocks;
-    uint32_t bytesPerPixelBlock;
-    uint32_t bytesPerComponent;
+    std::uint32_t nbObPixelBlocks;
+    std::uint32_t bytesPerPixelBlock;
+    std::uint32_t bytesPerComponent;
     bool hasTwoComponents;
-
-    uint16_t width;
-    uint16_t height;
+    std::uint16_t width;
+    std::uint16_t height;
 };
 
 enum FormatFlags
@@ -86,12 +85,12 @@ void initializeStaticValues()
         a3dcxFormat.pixelSizeInBits = 8;
     }
 
-    int16_t aWorkingBitTab[MaxCodeBitsLength];
-    int16_t aWorkingCodeTab[MaxSymbolValue];
+    std::int16_t aWorkingBitTab[MaxCodeBitsLength];
+    std::int16_t aWorkingCodeTab[MaxSymbolValue];
 
     // Initialize our workingTabs
-    memset(&aWorkingBitTab, 0xFF, MaxCodeBitsLength * sizeof(int16_t));
-    memset(&aWorkingCodeTab, 0xFF, MaxSymbolValue * sizeof(int16_t));
+    memset(&aWorkingBitTab, 0xFF, MaxCodeBitsLength * sizeof(std::int16_t));
+    memset(&aWorkingCodeTab, 0xFF, MaxSymbolValue * sizeof(std::int16_t));
 
     fillWorkingTabsHelper(1, 0x01, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
 
@@ -117,7 +116,7 @@ void initializeStaticValues()
     return buildHuffmanTree(sHuffmanTreeDict, &aWorkingBitTab[0], &aWorkingCodeTab[0]);
 }
 
-Format deduceFormat(uint32_t iFourCC)
+Format deduceFormat(std::uint32_t iFourCC)
 {
     switch(iFourCC)
     {
@@ -151,18 +150,18 @@ Format deduceFormat(uint32_t iFourCC)
     std::unreachable();
 }
 
-void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, uint8_t* ioOutputTab)
+void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, std::uint8_t* ioOutputTab)
 {
     uint32_t aPixelBlockPos = 0;
 
     while (aPixelBlockPos < iFullFormat.nbObPixelBlocks)
     {
         // Reading next code
-        uint16_t aCode = 0;
+        std::uint16_t aCode = 0;
         readCode(sHuffmanTreeDict, ioState, aCode);
 
         needBits(ioState, 1);
-        uint32_t aValue = readBits(ioState, 1);
+        std::uint32_t aValue = readBits(ioState, 1);
         dropBits(ioState, 1);
 
         while (aCode > 0)
@@ -171,7 +170,7 @@ void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vec
             {
                 if (aValue)
                 {
-                    *reinterpret_cast<int64_t*>(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * (aPixelBlockPos)])) = 0xFFFFFFFFFFFFFFFE;
+                    *std::bit_cast<std::int64_t*>(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * (aPixelBlockPos)])) = 0xFFFFFFFFFFFFFFFE;
 
                     ioAlphaBitMap[aPixelBlockPos] = true;
                     ioColorBitMap[aPixelBlockPos] = true;
@@ -188,31 +187,31 @@ void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vec
     }
 }
 
-void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, uint8_t* ioOutputTab)
+void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, std::uint8_t* ioOutputTab)
 {
     needBits(ioState, 4);
-    uint8_t aAlphaValueByte = readBits(ioState, 4);
+    std::uint8_t aAlphaValueByte = readBits(ioState, 4);
     dropBits(ioState, 4);
 
-    uint32_t aPixelBlockPos = 0;
+    std::uint32_t aPixelBlockPos = 0;
 
-    uint16_t aIntermediateByte = aAlphaValueByte | (aAlphaValueByte << 4);
-    uint32_t aIntermediateWord = aIntermediateByte | (aIntermediateByte << 8);
-    uint64_t aIntermediateDWord = aIntermediateWord | (aIntermediateWord << 16);
-    uint64_t aAlphaValue = aIntermediateDWord | (aIntermediateDWord << 32);
-    uint64_t zero = 0;
+    std::uint16_t aIntermediateByte = aAlphaValueByte | (aAlphaValueByte << 4);
+    std::uint32_t aIntermediateWord = aIntermediateByte | (aIntermediateByte << 8);
+    std::uint64_t aIntermediateDWord = aIntermediateWord | (aIntermediateWord << 16);
+    std::uint64_t aAlphaValue = aIntermediateDWord | (aIntermediateDWord << 32);
+    std::uint64_t zero = 0;
 
     while (aPixelBlockPos < iFullFormat.nbObPixelBlocks)
     {
         // Reading next code
-        uint16_t aCode = 0;
+        std::uint16_t aCode = 0;
         readCode(sHuffmanTreeDict, ioState, aCode);
 
         needBits(ioState, 2);
-        uint32_t aValue = readBits(ioState, 1);
+        std::uint32_t aValue = readBits(ioState, 1);
         dropBits(ioState, 1);
 
-        uint8_t isNotNull = readBits(ioState, 1);
+        std::uint8_t isNotNull = readBits(ioState, 1);
         if (aValue)
         {
             dropBits(ioState, 1);
@@ -223,7 +222,7 @@ void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitM
             {
                 if (aValue)
                 {
-                    memcpy(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * (aPixelBlockPos)]), isNotNull ? &aAlphaValue : &zero, iFullFormat.bytesPerComponent);
+                    std::memcpy(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * (aPixelBlockPos)]), isNotNull ? &aAlphaValue : &zero, iFullFormat.bytesPerComponent);
                     ioAlphaBitMap[aPixelBlockPos] = true;
                 }
                 --aCode;
@@ -238,28 +237,28 @@ void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitM
     }
 }
 
-void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, uint8_t* ioOutputTab)
+void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, std::uint8_t* ioOutputTab)
 {
     needBits(ioState, 8);
-    uint8_t aAlphaValueByte = readBits(ioState, 8);
+    std::uint8_t aAlphaValueByte = readBits(ioState, 8);
     dropBits(ioState, 8);
 
-    uint32_t aPixelBlockPos = 0;
+    std::uint32_t aPixelBlockPos = 0;
 
-    uint64_t aAlphaValue = aAlphaValueByte | (aAlphaValueByte << 8);
-    uint64_t zero = 0;
+    std::uint64_t aAlphaValue = aAlphaValueByte | (aAlphaValueByte << 8);
+    std::uint64_t zero = 0;
 
     while (aPixelBlockPos < iFullFormat.nbObPixelBlocks)
     {
         // Reading next code
-        uint16_t aCode = 0;
+        std::uint16_t aCode = 0;
         readCode(sHuffmanTreeDict, ioState, aCode);
 
         needBits(ioState, 2);
-        uint32_t aValue = readBits(ioState, 1);
+        std::uint32_t aValue = readBits(ioState, 1);
         dropBits(ioState, 1);
 
-        uint8_t isNotNull = readBits(ioState, 1);
+        std::uint8_t isNotNull = readBits(ioState, 1);
         if (aValue)
         {
             dropBits(ioState, 1);
@@ -288,34 +287,34 @@ void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitM
 void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, uint8_t* ioOutputTab)
 {
     needBits(ioState, 24);
-    uint16_t aBlue = readBits(ioState, 8);
+    std::uint16_t aBlue = readBits(ioState, 8);
     dropBits(ioState, 8);
-    uint16_t aGreen = readBits(ioState, 8);
+    std::uint16_t aGreen = readBits(ioState, 8);
     dropBits(ioState, 8);
-    uint16_t aRed = readBits(ioState, 8);
+    std::uint16_t aRed = readBits(ioState, 8);
     dropBits(ioState, 8);
 
     // TEMP
 
-    uint8_t aRedTemp1 = (aRed - (aRed >> 5)) >> 3;
-    uint8_t aBlueTemp1 = (aBlue - (aBlue >> 5)) >> 3;
+    std::uint8_t aRedTemp1 = (aRed - (aRed >> 5)) >> 3;
+    std::uint8_t aBlueTemp1 = (aBlue - (aBlue >> 5)) >> 3;
 
-    uint16_t aGreenTemp1 = (aGreen - (aGreen >> 6)) >> 2;
+    std::uint16_t aGreenTemp1 = (aGreen - (aGreen >> 6)) >> 2;
 
-    uint8_t aRedTemp2 = (aRedTemp1 << 3) + (aRedTemp1 >> 2);
-    uint8_t aBlueTemp2 = (aBlueTemp1 << 3) + (aBlueTemp1 >> 2);
+    std::uint8_t aRedTemp2 = (aRedTemp1 << 3) + (aRedTemp1 >> 2);
+    std::uint8_t aBlueTemp2 = (aBlueTemp1 << 3) + (aBlueTemp1 >> 2);
 
-    uint16_t aGreenTemp2 = (aGreenTemp1 << 2) + (aGreenTemp1 >> 4);
+    std::uint16_t aGreenTemp2 = (aGreenTemp1 << 2) + (aGreenTemp1 >> 4);
 
-    uint32_t aCompRed = 12 * (aRed - aRedTemp2) / (8 - ((aRedTemp1 & 0x11) == 0x11 ? 1 : 0));
-    uint32_t aCompBlue = 12 * (aBlue - aBlueTemp2) / (8 - ((aBlueTemp1 & 0x11) == 0x11 ? 1 : 0));
+    std::uint32_t aCompRed = 12 * (aRed - aRedTemp2) / (8 - ((aRedTemp1 & 0x11) == 0x11 ? 1 : 0));
+    std::uint32_t aCompBlue = 12 * (aBlue - aBlueTemp2) / (8 - ((aBlueTemp1 & 0x11) == 0x11 ? 1 : 0));
 
-    uint32_t aCompGreen = 12 * (aGreen - aGreenTemp2) / (8 - ((aGreenTemp1 & 0x1111) == 0x1111 ? 1 : 0));
+    std::uint32_t aCompGreen = 12 * (aGreen - aGreenTemp2) / (8 - ((aGreenTemp1 & 0x1111) == 0x1111 ? 1 : 0));
 
     // Handle Red
 
-    uint32_t aValueRed1;
-    uint32_t aValueRed2;
+    std::uint32_t aValueRed1;
+    std::uint32_t aValueRed2;
 
     if (aCompRed < 2)
     {
@@ -340,8 +339,8 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
 
     // Handle Blue
 
-    uint32_t aValueBlue1;
-    uint32_t aValueBlue2;
+    std::uint32_t aValueBlue1;
+    std::uint32_t aValueBlue2;
 
     if (aCompBlue < 2)
     {
@@ -366,8 +365,8 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
 
     // Handle Green
 
-    uint32_t aValueGreen1;
-    uint32_t aValueGreen2;
+    std::uint32_t aValueGreen1;
+    std::uint32_t aValueGreen2;
 
     if (aCompGreen < 2)
     {
@@ -392,14 +391,14 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
 
     // Final Colors
 
-    uint32_t aValueColor1;
-    uint32_t aValueColor2;
+    std::uint32_t aValueColor1;
+    std::uint32_t aValueColor2;
 
     aValueColor1 = aValueRed1 | ((aValueGreen1 | (aValueBlue1 << 6)) << 5);
     aValueColor2 = aValueRed2 | ((aValueGreen2 | (aValueBlue2 << 6)) << 5);
 
-    uint32_t aTempValue1 = 0;
-    uint32_t aTempValue2 = 0;
+    std::uint32_t aTempValue1 = 0;
+    std::uint32_t aTempValue2 = 0;
 
     if (aValueRed1 != aValueRed2)
     {
@@ -463,14 +462,14 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
 
     if (aValueColor2 >= aValueColor1)
     {
-        uint32_t aSwapTemp = aValueColor1;
+        std::uint32_t aSwapTemp = aValueColor1;
         aValueColor1 = aValueColor2;
         aValueColor2 = aSwapTemp;
 
         aTempValue1 = 12 - aTempValue1;
     }
 
-    uint32_t aColorChosen;
+    std::uint32_t aColorChosen;
 
     if (aDxt1SpecialCase)
     {
@@ -497,21 +496,21 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
     }
     // TEMP
 
-    uint64_t aTempValue = aColorChosen | (aColorChosen << 2) | ((aColorChosen | (aColorChosen << 2)) << 4);
+    std::uint64_t aTempValue = aColorChosen | (aColorChosen << 2) | ((aColorChosen | (aColorChosen << 2)) << 4);
     aTempValue = aTempValue | (aTempValue << 8);
     aTempValue = aTempValue | (aTempValue << 16);
-    uint64_t aFinalValue = aValueColor1 | (aValueColor2 << 16) | (aTempValue << 32);
+    std::uint64_t aFinalValue = aValueColor1 | (aValueColor2 << 16) | (aTempValue << 32);
 
-    uint32_t aPixelBlockPos = 0;
+    std::uint32_t aPixelBlockPos = 0;
 
     while (aPixelBlockPos < iFullFormat.nbObPixelBlocks)
     {
         // Reading next code
-        uint16_t aCode = 0;
+        std::uint16_t aCode = 0;
         readCode(sHuffmanTreeDict, ioState, aCode);
 
         needBits(ioState, 1);
-        uint32_t aValue = readBits(ioState, 1);
+        std::uint32_t aValue = readBits(ioState, 1);
         dropBits(ioState, 1);
 
         while (aCode > 0)
@@ -520,8 +519,8 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
             {
                 if (aValue)
                 {
-                    uint32_t aOffset = iFullFormat.bytesPerPixelBlock * (aPixelBlockPos) + (iFullFormat.hasTwoComponents ? iFullFormat.bytesPerComponent : 0);
-                    memcpy(&(ioOutputTab[aOffset]), &aFinalValue, iFullFormat.bytesPerComponent);
+                    std::uint32_t aOffset = iFullFormat.bytesPerPixelBlock * (aPixelBlockPos) + (iFullFormat.hasTwoComponents ? iFullFormat.bytesPerComponent : 0);
+                    std::memcpy(&(ioOutputTab[aOffset]), &aFinalValue, iFullFormat.bytesPerComponent);
                     ioColorBitMap[aPixelBlockPos] = true;
                 }
                 --aCode;
@@ -536,13 +535,13 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
     }
 }
 
-void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutputSize, uint8_t* ioOutputTab)
+void inflateData(State& iState, const FullFormat& iFullFormat, std::uint32_t ioOutputSize, std::uint8_t* ioOutputTab)
 {
     // Bitmaps
     std::vector<bool> aColorBitmap;
     std::vector<bool> aAlphaBitmap;
 
-    uint32_t aChunkStartPosition = iState.inputPos;
+    std::uint32_t aChunkStartPosition = iState.inputPos;
 
     iState.inputPos = aChunkStartPosition;
 
@@ -552,12 +551,12 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
 
     // Getting size of compressed data
     needBits(iState, 32);
-    uint32_t aDataSize = readBits(iState, 32);
+    std::uint32_t aDataSize = readBits(iState, 32);
     dropBits(iState, 32);
 
     // Compression Flags
     needBits(iState, 32);
-    uint32_t aCompressionFlags = readBits(iState, 32);
+    std::uint32_t aCompressionFlags = readBits(iState, 32);
     dropBits(iState, 32);
 
     aColorBitmap.assign(iFullFormat.nbObPixelBlocks, false);
@@ -583,7 +582,7 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
         decodePlainColor(iState, aColorBitmap, iFullFormat, ioOutputTab);
     }
 
-    uint32_t aLoopIndex;
+    std::uint32_t aLoopIndex;
 
     if (iState.bits >= 32)
     {
@@ -596,11 +595,11 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
         {
             if (!aAlphaBitmap[aLoopIndex])
             {
-                (*reinterpret_cast<uint32_t*>(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * aLoopIndex]))) = iState.input[iState.inputPos];
+                (*std::bit_cast<std::uint32_t*>(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * aLoopIndex]))) = iState.input[iState.inputPos];
                 ++iState.inputPos;
                 if (iFullFormat.bytesPerComponent > 4)
                 {
-                    (*reinterpret_cast<uint32_t*>(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * aLoopIndex + 4]))) = iState.input[iState.inputPos];
+                    (*std::bit_cast<std::uint32_t*>(&(ioOutputTab[iFullFormat.bytesPerPixelBlock * aLoopIndex + 4]))) = iState.input[iState.inputPos];
                     ++iState.inputPos;
                 }
             }
@@ -613,8 +612,8 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
         {
             if (!aColorBitmap[aLoopIndex])
             {
-                uint32_t aOffset = iFullFormat.bytesPerPixelBlock * aLoopIndex + (iFullFormat.hasTwoComponents ? iFullFormat.bytesPerComponent : 0);
-                (*reinterpret_cast<uint32_t*>(&(ioOutputTab[aOffset]))) = iState.input[iState.inputPos];
+                std::uint32_t aOffset = iFullFormat.bytesPerPixelBlock * aLoopIndex + (iFullFormat.hasTwoComponents ? iFullFormat.bytesPerComponent : 0);
+                (*std::bit_cast<std::uint32_t*>(&(ioOutputTab[aOffset]))) = iState.input[iState.inputPos];
                 ++iState.inputPos;
             }
         }
@@ -624,8 +623,8 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
             {
                 if (!aColorBitmap[aLoopIndex])
                 {
-                    uint32_t aOffset = iFullFormat.bytesPerPixelBlock * aLoopIndex + 4 + (iFullFormat.hasTwoComponents ? iFullFormat.bytesPerComponent : 0);
-                    (*reinterpret_cast<uint32_t*>(&(ioOutputTab[aOffset]))) = iState.input[iState.inputPos];
+                    std::uint32_t aOffset = iFullFormat.bytesPerPixelBlock * aLoopIndex + 4 + (iFullFormat.hasTwoComponents ? iFullFormat.bytesPerComponent : 0);
+                    (*std::bit_cast<std::uint32_t*>(&(ioOutputTab[aOffset]))) = iState.input[iState.inputPos];
                     ++iState.inputPos;
                 }
             }
@@ -663,7 +662,7 @@ std::uint32_t inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHei
 
         // Initialize state
         State aState;
-        aState.input = std::bit_cast<const uint32_t*>(iInputTab.data());
+        aState.input = std::bit_cast<const std::uint32_t*>(iInputTab.data());
         aState.inputSize = iInputTab.size() / 4;
         aState.inputPos = 0;
 
@@ -673,7 +672,7 @@ std::uint32_t inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHei
 
         aState.isEmpty = false;
 
-        uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
+        std::uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
         anOutputTab = (uint8_t*)ioOutputTab.data();        
 
         texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);

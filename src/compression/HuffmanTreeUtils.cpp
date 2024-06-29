@@ -5,7 +5,7 @@
 namespace gw2::compression
 {
 
-void readCode(const HuffmanTree& iHuffmanTree, State& ioState, uint16_t& ioCode)
+void readCode(const HuffmanTree& iHuffmanTree, State& ioState, std::uint16_t& ioCode)
 {
     assert(!iHuffmanTree.isEmpty && "Trying to read code from an empty HuffmanTree.");
 
@@ -18,20 +18,20 @@ void readCode(const HuffmanTree& iHuffmanTree, State& ioState, uint16_t& ioCode)
     }
     else
     {
-        uint16_t anIndex = 0;
+        std::uint16_t anIndex = 0;
         while (readBits(ioState, 32) < iHuffmanTree.codeCompTab[anIndex])
         {
             ++anIndex;
         }
 
-        uint8_t aNbBits = iHuffmanTree.codeBitsTab[anIndex];
+        std::uint8_t aNbBits = iHuffmanTree.codeBitsTab[anIndex];
         ioCode = iHuffmanTree.symbolValueTab[iHuffmanTree.symbolValueTabOffsetTab[anIndex] -
                                              ((readBits(ioState, 32) - iHuffmanTree.codeCompTab[anIndex]) >> (32 - aNbBits))];
         dropBits(ioState, aNbBits);
     }
 }
 
-void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int16_t* ioWorkingCodeTab)
+void buildHuffmanTree(HuffmanTree& ioHuffmanTree, std::int16_t* ioWorkingBitTab, std::int16_t* ioWorkingCodeTab)
 {
     // Resetting Huffmantrees
     memset(&ioHuffmanTree.codeCompTab, 0, sizeof(ioHuffmanTree.codeCompTab));
@@ -45,8 +45,8 @@ void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int1
     ioHuffmanTree.isEmpty = true;
 
     // Building the HuffmanTree
-    uint32_t aCode = 0;
-    uint8_t aNbBits = 0;
+    std::uint32_t aCode = 0;
+    std::uint8_t aNbBits = 0;
 
     // First part, filling hashTable for codes that are of less than 8 bits
     while (aNbBits <= MaxNbBitsHash)
@@ -55,12 +55,12 @@ void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int1
         {
             ioHuffmanTree.isEmpty = false;
 
-            int16_t aCurrentSymbol = ioWorkingBitTab[aNbBits];
+            std::int16_t aCurrentSymbol = ioWorkingBitTab[aNbBits];
             while (aCurrentSymbol != -1)
             {
                 // Processing hash values
-                uint16_t aHashValue = aCode << (MaxNbBitsHash - aNbBits);
-                uint16_t aNextHashValue = (aCode + 1) << (MaxNbBitsHash - aNbBits);
+                std::uint16_t aHashValue = aCode << (MaxNbBitsHash - aNbBits);
+                std::uint16_t aNextHashValue = (aCode + 1) << (MaxNbBitsHash - aNbBits);
 
                 while (aHashValue < aNextHashValue)
                 {
@@ -77,8 +77,8 @@ void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int1
         ++aNbBits;
     }
 
-    uint16_t aCodeCompTabIndex = 0;
-    uint16_t aSymbolOffset = 0;
+    std::uint16_t aCodeCompTabIndex = 0;
+    std::uint16_t aSymbolOffset = 0;
 
     // Second part, filling classical structure for other codes
     while (aNbBits < MaxCodeBitsLength)
@@ -87,7 +87,7 @@ void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int1
         {
             ioHuffmanTree.isEmpty = false;
 
-            int16_t aCurrentSymbol = ioWorkingBitTab[aNbBits];
+            std::int16_t aCurrentSymbol = ioWorkingBitTab[aNbBits];
             while (aCurrentSymbol != -1)
             {
                 // Registering the code
@@ -114,7 +114,7 @@ void buildHuffmanTree(HuffmanTree& ioHuffmanTree, int16_t* ioWorkingBitTab, int1
     }
 }
 
-void fillWorkingTabsHelper(const uint8_t iBits, const int16_t iSymbol, int16_t* ioWorkingBitTab, int16_t* ioWorkingCodeTab)
+void fillWorkingTabsHelper(const std::uint8_t iBits, const std::int16_t iSymbol, std::int16_t* ioWorkingBitTab, std::int16_t* ioWorkingCodeTab)
 {
     // checking out of bounds
     assert(iBits < MaxCodeBitsLength && "Too many bits.");    

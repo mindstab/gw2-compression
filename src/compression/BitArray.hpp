@@ -4,6 +4,7 @@
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
+#include <bit>
 
 namespace gw2::utils {
 
@@ -133,7 +134,7 @@ class BitArray {
           _pBufferPos += sizeof(IntType);
         }
       }
-      oValue = *(reinterpret_cast<const IntType*>(_pBufferPos));
+      oValue = *(std::bit_cast<const IntType*>(_pBufferPos));
       _bytesAvail -= sizeof(IntType);
       _pBufferPos += sizeof(IntType);
       oNbPulledBits = sizeof(IntType) * 8;

@@ -11,13 +11,13 @@ namespace gw2::compression
 namespace dat
 {
 
-const uint32_t sDatFileNbBitsHash        = 8;
-const uint32_t sDatFileMaxCodeBitsLength = 32;
-const uint32_t sDatFileMaxSymbolValue    = 285;
+static constexpr std::uint32_t sDatFileNbBitsHash        = 8;
+static constexpr std::uint32_t sDatFileMaxCodeBitsLength = 32;
+static constexpr std::uint32_t sDatFileMaxSymbolValue    = 285;
 
-typedef utils::BitArray<uint32_t> DatFileBitArray;
-typedef HuffmanTree<uint16_t, sDatFileNbBitsHash, sDatFileMaxCodeBitsLength, sDatFileMaxSymbolValue> DatFileHuffmanTree;
-typedef HuffmanTreeBuilder<uint16_t, sDatFileMaxCodeBitsLength, sDatFileMaxSymbolValue> DatFileHuffmanTreeBuilder;
+using DatFileBitArray = utils::BitArray<std::uint32_t>;
+using DatFileHuffmanTree = HuffmanTree<std::uint16_t, sDatFileNbBitsHash, sDatFileMaxCodeBitsLength, sDatFileMaxSymbolValue>;
+using DatFileHuffmanTreeBuilder = HuffmanTreeBuilder<std::uint16_t, sDatFileMaxCodeBitsLength, sDatFileMaxSymbolValue>;
 
 static DatFileHuffmanTree sDatFileHuffmanTreeDict;
 
@@ -25,9 +25,9 @@ static DatFileHuffmanTree sDatFileHuffmanTreeDict;
 bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHuffmanTree, DatFileHuffmanTreeBuilder& ioHuffmanTreeBuilder)
 {
     // Reading the number of symbols to read
-    uint16_t aNumberOfSymbols;
+    std::uint16_t aNumberOfSymbols;
     ioInputBitArray.read(aNumberOfSymbols);
-    ioInputBitArray.drop<uint16_t>();
+    ioInputBitArray.drop<std::uint16_t>();
 
     if (aNumberOfSymbols > sDatFileMaxSymbolValue)
     {
@@ -36,17 +36,17 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
 
     ioHuffmanTreeBuilder.clear();
 
-    int16_t aRemainingSymbols = aNumberOfSymbols - 1;
+    std::int16_t aRemainingSymbols = aNumberOfSymbols - 1;
 
     // Fetching the code repartition
     while (aRemainingSymbols >= 0)
     {
-        uint16_t aCode;
+        std::uint16_t aCode;
 
         sDatFileHuffmanTreeDict.readCode(ioInputBitArray, aCode);
 
-        uint8_t aCodeNumberOfBits = aCode & 0x1F;
-        uint16_t aCodeNumberOfSymbols = (aCode >> 5) + 1;
+        std::uint8_t aCodeNumberOfBits = aCode & 0x1F;
+        std::uint16_t aCodeNumberOfSymbols = (aCode >> 5) + 1;
 
         if (aCodeNumberOfBits == 0)
         {
@@ -66,13 +66,13 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
     return ioHuffmanTreeBuilder.buildHuffmanTree(ioHuffmanTree);
 }
 
-void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_t* ioOutputTab)
+void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  std::uint8_t* ioOutputTab)
 {
-    uint32_t anOutputPos = 0;
+    std::uint32_t anOutputPos = 0;
 
     // Reading the const write size addition value
     ioInputBitArray.drop<4>();
-    uint16_t aWriteSizeConstAdd;
+    std::uint16_t aWriteSizeConstAdd;
     ioInputBitArray.read<4>(aWriteSizeConstAdd);
     aWriteSizeConstAdd += 1;
     ioInputBitArray.drop<4>();
@@ -93,12 +93,12 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
         }
 
         // Reading MaxCount
-        uint32_t aMaxCount;
+        std::uint32_t aMaxCount;
         ioInputBitArray.read<4>(aMaxCount);
         aMaxCount = (aMaxCount + 1) << 12;
         ioInputBitArray.drop<4>();
 
-        uint32_t aCurrentCodeReadCount = 0;
+        std::uint32_t aCurrentCodeReadCount = 0;
 
         while ((aCurrentCodeReadCount < aMaxCount) &&
                 (anOutputPos < iOutputSize))
@@ -106,12 +106,12 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             ++aCurrentCodeReadCount;
 
             // Reading next code
-            uint16_t aSymbol = 0;
+            std::uint16_t aSymbol = 0;
             aHuffmanTreeSymbol.readCode(ioInputBitArray, aSymbol);
 
             if (aSymbol < 0x100)
             {
-                ioOutputTab[anOutputPos] = static_cast<uint8_t>(aSymbol);
+                ioOutputTab[anOutputPos] = static_cast<std::uint8_t>(aSymbol);
                 ++anOutputPos;
                 continue;
             }
@@ -121,9 +121,9 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             aSymbol -= 0x100;
 
             // write size
-            div_t aCodeDiv4 = div(aSymbol, 4);
+            std::div_t aCodeDiv4 = std::div(aSymbol, 4);
 
-            uint32_t aWriteSize = 0;
+            std::uint32_t aWriteSize = 0;
             if (aCodeDiv4.quot == 0)
             {
                 aWriteSize = aSymbol;
@@ -144,8 +144,8 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             //additional bits
             if (aCodeDiv4.quot > 1 && aSymbol != 28)
             {
-                uint8_t aWriteSizeAddBits = aCodeDiv4.quot - 1;
-                uint32_t aWriteSizeAdd;
+                std::uint8_t aWriteSizeAddBits = aCodeDiv4.quot - 1;
+                std::uint32_t aWriteSizeAdd;
                 ioInputBitArray.read(aWriteSizeAddBits, aWriteSizeAdd);
                 aWriteSize |= aWriteSizeAdd;
                 ioInputBitArray.drop(aWriteSizeAddBits);
@@ -156,9 +156,9 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             // Reading the write offset
             aHuffmanTreeCopy.readCode(ioInputBitArray, aSymbol);
 
-            div_t aCodeDiv2 = div(aSymbol, 2);
+            std::div_t aCodeDiv2 = std::div(aSymbol, 2);
 
-            uint32_t aWriteOffset = 0;
+            std::uint32_t aWriteOffset = 0;
             if (aCodeDiv2.quot == 0)
             {
                 aWriteOffset = aSymbol;
@@ -175,15 +175,15 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
             //additional bits
             if (aCodeDiv2.quot > 1)
             {
-                uint8_t aWriteOffsetAddBits = aCodeDiv2.quot - 1;
-                uint32_t aWriteOffsetAdd;
+                std::uint8_t aWriteOffsetAddBits = aCodeDiv2.quot - 1;
+                std::uint32_t aWriteOffsetAdd;
                 ioInputBitArray.read(aWriteOffsetAddBits, aWriteOffsetAdd);
                 aWriteOffset |= aWriteOffsetAdd;
                 ioInputBitArray.drop(aWriteOffsetAddBits);
             }
             aWriteOffset += 1;
 
-            uint32_t anAlreadyWritten = 0;
+            std::uint32_t anAlreadyWritten = 0;
             while ((anAlreadyWritten < aWriteSize) &&
                     (anOutputPos < iOutputSize))
             {
@@ -204,12 +204,12 @@ std::uint32_t inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::sp
         dat::DatFileBitArray anInputBitArray(iInputTab, 16384); // Skipping four bytes every 65k chunk
 
         // Skipping header & Getting size of the uncompressed data
-        anInputBitArray.drop<uint32_t>();
+        anInputBitArray.drop<std::uint32_t>();
 
         // Getting size of the uncompressed data
         uint32_t anOutputSize;
         anInputBitArray.read(anOutputSize);
-        anInputBitArray.drop<uint32_t>();
+        anInputBitArray.drop<std::uint32_t>();
         assert(anOutputSize <= ioOutputTab.size());
 
         anOutputTab = (uint8_t*)ioOutputTab.data();
