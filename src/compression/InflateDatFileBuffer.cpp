@@ -63,7 +63,7 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
     return ioHuffmanTreeBuilder.buildHuffmanTree(ioHuffmanTree);
 }
 
-void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  std::uint8_t* ioOutputTab)
+void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  std::byte* ioOutputTab)
 {
     std::uint32_t anOutputPos = 0;
 
@@ -108,7 +108,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  s
 
             if (aSymbol < 0x100)
             {
-                ioOutputTab[anOutputPos] = static_cast<std::uint8_t>(aSymbol);
+                ioOutputTab[anOutputPos] = static_cast<std::byte>(aSymbol);
                 ++anOutputPos;
                 continue;
             }
@@ -218,8 +218,7 @@ Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
         return std::unexpected{Error::kOutputBufferTooSmall};
     }
 
-    anOutputTab = (uint8_t*)ioOutputTab.data();
-    dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
+    dat::inflatedata(anInputBitArray, anOutputSize, ioOutputTab.data());
     return anOutputSize;
 }
 

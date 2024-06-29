@@ -150,7 +150,7 @@ Format deduceFormat(std::uint32_t iFourCC)
     std::unreachable();
 }
 
-void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, std::uint8_t* ioOutputTab)
+void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, std::byte* ioOutputTab)
 {
     uint32_t aPixelBlockPos = 0;
 
@@ -187,7 +187,7 @@ void decodeWhiteColor(State& ioState, std::vector<bool>& ioAlphaBitMap, std::vec
     }
 }
 
-void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, std::uint8_t* ioOutputTab)
+void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, std::byte* ioOutputTab)
 {
     needBits(ioState, 4);
     std::uint8_t aAlphaValueByte = readBits(ioState, 4);
@@ -237,7 +237,7 @@ void decodeConstantAlphaFrom4Bits(State& ioState, std::vector<bool>& ioAlphaBitM
     }
 }
 
-void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, std::uint8_t* ioOutputTab)
+void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitMap, const FullFormat& iFullFormat, std::byte* ioOutputTab)
 {
     needBits(ioState, 8);
     std::uint8_t aAlphaValueByte = readBits(ioState, 8);
@@ -284,7 +284,7 @@ void decodeConstantAlphaFrom8Bits(State& ioState, std::vector<bool>& ioAlphaBitM
     }
 }
 
-void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, uint8_t* ioOutputTab)
+void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const FullFormat& iFullFormat, std::byte* ioOutputTab)
 {
     needBits(ioState, 24);
     std::uint16_t aBlue = readBits(ioState, 8);
@@ -535,7 +535,7 @@ void decodePlainColor(State& ioState, std::vector<bool>& ioColorBitMap, const Fu
     }
 }
 
-void inflateData(State& iState, const FullFormat& iFullFormat, std::uint32_t ioOutputSize, std::uint8_t* ioOutputTab)
+void inflateData(State& iState, const FullFormat& iFullFormat, std::uint32_t ioOutputSize, std::byte* ioOutputTab)
 {
     // Bitmaps
     std::vector<bool> aColorBitmap;
@@ -683,8 +683,7 @@ Result<std::uint32_t> inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint1
         return std::unexpected{Error::kOutputBufferTooSmall};
     }
 
-    anOutputTab = (uint8_t*)ioOutputTab.data();
-    texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);
+    texture::inflateData(aState, aFullFormat, anOutputSize, ioOutputTab.data());
     return anOutputSize;   
 }
 
