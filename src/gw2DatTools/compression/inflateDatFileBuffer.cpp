@@ -196,24 +196,12 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
 }
 }
 
-uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab)
+void inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
 {
-    if (iInputTab == nullptr)
-    {
-        throw std::exception("Input buffer is null.");
-    }
-
-    if (ioOutputTab != nullptr && ioOutputSize == 0)
-    {
-        throw std::exception("Output buffer is not null and outputSize is not defined.");
-    }
-
     uint8_t* anOutputTab(nullptr);
-    bool isOutputTabOwned(true);
-
     try
     {
-        dat::DatFileBitArray anInputBitArray(iInputTab, iInputSize, 16384); // Skipping four bytes every 65k chunk
+        dat::DatFileBitArray anInputBitArray(iInputTab, 16384); // Skipping four bytes every 65k chunk
 
         // Skipping header & Getting size of the uncompressed data
         anInputBitArray.drop<uint32_t>();
@@ -222,34 +210,14 @@ uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  ui
         uint32_t anOutputSize;
         anInputBitArray.read(anOutputSize);
         anInputBitArray.drop<uint32_t>();
+        assert(anOutputSize <= ioOutputTab.size());
 
-        if (ioOutputSize != 0)
-        {
-            anOutputSize = std::min(anOutputSize, ioOutputSize);
-        }
-
-        ioOutputSize = anOutputSize;
-
-        if (ioOutputTab == nullptr)
-        {
-            anOutputTab = static_cast<uint8_t*>(malloc(sizeof(uint8_t) * anOutputSize));
-        }
-        else
-        {
-            isOutputTabOwned = false;
-            anOutputTab = ioOutputTab;
-        }
+        anOutputTab = (uint8_t*)ioOutputTab.data();
 
         dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
-
-        return anOutputTab;
     }
     catch(std::exception& iException)
     {
-        if (isOutputTabOwned)
-        {
-            free(anOutputTab);
-        }
         throw iException; // Rethrow exception
     }
 }

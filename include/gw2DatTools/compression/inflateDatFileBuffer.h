@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include <cstddef>
+#include <span>
 
 namespace gw2::compression
 {
@@ -20,6 +21,6 @@ namespace gw2::compression
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
+void inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab);
 
 }

@@ -14,7 +14,6 @@ SET(SOURCES
     src/gw2DatTools/compression/inflateDatFileBuffer.cpp
     src/gw2DatTools/compression/inflateTextureFileBuffer.cpp
     src/gw2DatTools/utils/BitArray.h
-    src/gw2DatTools/utils/BitArray.i
 )
 
 add_library(${PROJECT_NAME} STATIC ${INCLUDES} ${SOURCES})
