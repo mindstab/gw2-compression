@@ -1,12 +1,9 @@
-#ifndef GW2DATTOOLS_COMPRESSION_INFLATETEXTUREFILEBUFFER_H
-#define GW2DATTOOLS_COMPRESSION_INFLATETEXTUREFILEBUFFER_H
+#pragma once
 
 #include <cstdint>
 #include <string>
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 
 /** @Inputs:
@@ -23,7 +20,6 @@ namespace compression
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-
 uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 
 /** @Inputs:
@@ -43,10 +39,7 @@ uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-
 uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
         uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
-}
-}
 
-#endif // GW2DATTOOLS_COMPRESSION_INFLATETEXTUREFILEBUFFER_H
+}

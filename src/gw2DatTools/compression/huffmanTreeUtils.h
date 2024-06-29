@@ -1,13 +1,10 @@
-#ifndef GW2DATTOOLS_COMPRESSION_HUFFMANTREEUTILS_H
-#define GW2DATTOOLS_COMPRESSION_HUFFMANTREEUTILS_H
+#pragma once
 
 #include "gw2DatTools/exception/Exception.h"
 
 #include <cstdint>
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 
 static const uint32_t MaxCodeBitsLength = 32; // Max number of bits per code
@@ -148,6 +145,3 @@ inline uint32_t readBits(const State& iState, const uint8_t iBits)
 }
 
 }
-}
-
-#endif // GW2DATTOOLS_COMPRESSION_HUFFMANTREEUTILS_H

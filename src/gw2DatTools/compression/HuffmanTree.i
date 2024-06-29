@@ -1,11 +1,8 @@
-#ifndef GW2DATTOOLS_COMPRESSION_HUFFMANTREE_I
-#define GW2DATTOOLS_COMPRESSION_HUFFMANTREE_I
+#pragma once
 
 #include "../utils/BitArray.h"
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 
 template <typename SymbolType, 
@@ -194,6 +191,3 @@ bool HuffmanTreeBuilder<SymbolType, sMaxCodeBitsLength, sMaxSymbolValue>::buildH
 }
 
 }
-}
-
-#endif // GW2DATTOOLS_COMPRESSION_HUFFMANTREE_I

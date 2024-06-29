@@ -9,9 +9,7 @@
 #include <iostream>
 #include <vector>
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 namespace texture
 {
@@ -836,5 +834,4 @@ uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t i
     }
 }
 
-}
 }

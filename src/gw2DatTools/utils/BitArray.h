@@ -1,11 +1,8 @@
-#ifndef GW2DATTOOLS_UTILS_BITARRAY_H
-#define GW2DATTOOLS_UTILS_BITARRAY_H
+#pragma once
 
 #include <cstdint>
 
-namespace gw2dt
-{
-namespace utils
+namespace gw2::utils
 {
 
 template <typename IntType>
@@ -53,8 +50,5 @@ private:
 };
 
 }
-}
 
 #include "BitArray.i"
-
-#endif // GW2DATTOOLS_UTILS_BITARRAY_H

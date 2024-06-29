@@ -21,6 +21,6 @@ SET(SOURCES
 
 add_library(${PROJECT_NAME} STATIC ${INCLUDES} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
 add_library(gw2::compression ALIAS ${PROJECT_NAME})

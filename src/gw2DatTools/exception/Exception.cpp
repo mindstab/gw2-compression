@@ -1,8 +1,6 @@
 #include "gw2DatTools/exception/Exception.h"
 
-namespace gw2dt
-{
-namespace exception
+namespace gw2::exception
 {
 
 Exception::Exception(const char* iReason) :
@@ -14,5 +12,4 @@ Exception::~Exception()
 {
 }
 
-}
 }

@@ -8,9 +8,7 @@
 #include "HuffmanTree.h"
 #include "../utils/BitArray.h"
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 namespace dat
 {
@@ -552,5 +550,4 @@ DatFileHuffmanTreeDictStaticInitializer::DatFileHuffmanTreeDictStaticInitializer
 
 static DatFileHuffmanTreeDictStaticInitializer aDatFileHuffmanTreeDictStaticInitializer(dat::sDatFileHuffmanTreeDict);
 
-}
 }

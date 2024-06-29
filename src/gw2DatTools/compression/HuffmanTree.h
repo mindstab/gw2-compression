@@ -1,14 +1,11 @@
-#ifndef GW2DATTOOLS_COMPRESSION_HUFFMANTREE_H
-#define GW2DATTOOLS_COMPRESSION_HUFFMANTREE_H
+#pragma once
 
 #include <array>
 #include <cstdint>
 
 #include "../utils/BitArray.h"
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 
 template <typename SymbolType,
@@ -66,8 +63,5 @@ private:
 };
 
 }
-}
 
 #include "HuffmanTree.i"
-
-#endif // GW2DATTOOLS_COMPRESSION_HUFFMANTREE_H

@@ -1,11 +1,8 @@
-#ifndef GW2DATTOOLS_EXCEPTION_EXCEPTION_H
-#define GW2DATTOOLS_EXCEPTION_EXCEPTION_H
+#pragma once
 
 #include <exception>
 
-namespace gw2dt
-{
-namespace exception
+namespace gw2::exception
 {
 
 class Exception: public std::exception
@@ -16,6 +13,3 @@ public:
 };
 
 }
-}
-
-#endif // GW2DATTOOLS_EXCEPTION_EXCEPTION_H

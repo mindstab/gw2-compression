@@ -1,12 +1,9 @@
-#ifndef GW2DATTOOLS_COMPRESSION_INFLATEDATFILEBUFFER_H
-#define GW2DATTOOLS_COMPRESSION_INFLATEDATFILEBUFFER_H
+#pragma once
 
 #include <cstdint>
 #include <string>
 
-namespace gw2dt
-{
-namespace compression
+namespace gw2::compression
 {
 
 /** @Inputs:
@@ -23,10 +20,6 @@ namespace compression
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-
 uint8_t* inflateDatFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 
 }
-}
-
-#endif // GW2DATTOOLS_COMPRESSION_INFLATEDATFILEBUFFER_H

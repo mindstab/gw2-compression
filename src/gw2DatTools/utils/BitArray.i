@@ -1,13 +1,10 @@
-#ifndef GW2DATTOOLS_UTILS_BITARRAY_I
-#define GW2DATTOOLS_UTILS_BITARRAY_I
+#pragma once
 
 #include "gw2DatTools/exception/Exception.h"
 
 #include <cassert>
 
-namespace gw2dt
-{
-namespace utils
+namespace gw2::utils
 {
 
 template <typename IntType>
@@ -192,6 +189,3 @@ void BitArray<IntType>::drop()
 
 
 }
-}
-
-#endif // GW2DATTOOLS_UTILS_BITARRAY_I
