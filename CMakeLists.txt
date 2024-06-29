@@ -12,7 +12,7 @@ SET(SOURCES
     src/compression/HuffmanTreeUtils.hpp
     src/compression/InflateDatFileBuffer.cpp
     src/compression/InflateTextureFileBuffer.cpp
-    src/utils/BitArray.hpp
+    src/compression/BitArray.hpp
 )
 
 add_library(${PROJECT_NAME} STATIC ${INCLUDES} ${SOURCES})
