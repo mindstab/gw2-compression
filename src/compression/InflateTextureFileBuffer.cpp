@@ -637,6 +637,14 @@ Result<std::uint32_t> inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint1
 {
     uint8_t* anOutputTab(nullptr);
 
+    if (iInputTab.empty()) {
+        return std::unexpected{Error::kInputBufferIsEmpty};
+    }
+
+    if (ioOutputTab.empty()) {
+        return std::unexpected{Error::kOutputBufferIsEmpty};
+    }
+
     if (!texture::sStaticValuesInitialized)
     {
         texture::initializeStaticValues();
@@ -671,8 +679,11 @@ Result<std::uint32_t> inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint1
     aState.isEmpty = false;
 
     std::uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
-    anOutputTab = (uint8_t*)ioOutputTab.data();        
+    if (ioOutputTab.size() < anOutputSize) {
+        return std::unexpected{Error::kOutputBufferTooSmall};
+    }
 
+    anOutputTab = (uint8_t*)ioOutputTab.data();
     texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);
     return anOutputSize;   
 }

@@ -29,10 +29,7 @@ bool parseHuffmanTree(DatFileBitArray& ioInputBitArray, DatFileHuffmanTree& ioHu
     ioInputBitArray.read(aNumberOfSymbols);
     ioInputBitArray.drop<std::uint16_t>();
 
-    if (aNumberOfSymbols > sDatFileMaxSymbolValue)
-    {
-        throw std::exception("Too many symbols to decode.");
-    }
+    assert(aNumberOfSymbols <= sDatFileMaxSymbolValue && "Too many symbols to decode.");
 
     ioHuffmanTreeBuilder.clear();
 
@@ -138,7 +135,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  s
             }
             else
             {
-                throw std::exception("Invalid value for writeSize code.");
+                assert(false && "Invalid value for writeSize code.");
             }
 
             //additional bits
@@ -169,7 +166,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,  s
             }
             else
             {
-                throw std::exception("Invalid value for writeOffset code.");
+                assert(false && "Invalid value for writeOffset code.");
             }
 
             //additional bits
@@ -200,19 +197,28 @@ Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
 {
     uint8_t* anOutputTab(nullptr);
 
+    if (iInputTab.empty()) {
+        return std::unexpected{Error::kInputBufferIsEmpty};
+    }
+
+    if (ioOutputTab.empty()) {
+        return std::unexpected{Error::kOutputBufferIsEmpty};
+    }
+
     dat::DatFileBitArray anInputBitArray(iInputTab, 16384); // Skipping four bytes every 65k chunk
 
     // Skipping header & Getting size of the uncompressed data
     anInputBitArray.drop<std::uint32_t>();
 
     // Getting size of the uncompressed data
-    uint32_t anOutputSize;
+    std::uint32_t anOutputSize;
     anInputBitArray.read(anOutputSize);
     anInputBitArray.drop<std::uint32_t>();
-    assert(anOutputSize <= ioOutputTab.size());
+    if (ioOutputTab.size() < anOutputSize) {
+        return std::unexpected{Error::kOutputBufferTooSmall};
+    }
 
     anOutputTab = (uint8_t*)ioOutputTab.data();
-
     dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
     return anOutputSize;
 }

@@ -5,6 +5,9 @@
 namespace gw2::compression {
 
 enum class Error {
+    kInputBufferIsEmpty,
+    kOutputBufferIsEmpty,
+    kOutputBufferTooSmall,
 };
 
 template <typename T>
