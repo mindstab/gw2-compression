@@ -1,26 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include <cstddef>
+#include <span>
 
 namespace gw2::compression
 {
-
-/** @Inputs:
- *    - iInputSize: Size of the input buffer
- *    - iInputTab: Pointer to the buffer to inflate
- *    - ioOutputSize: if the value is 0 then we decode everything
- *                    else we decode until we reach the io_outputSize
- *    - ioOutputTab: Optional output buffer, in case you provide this buffer,
- *                   ioOutputSize shall be inferior or equal to the size of this buffer
- *  @Outputs:
- *    - ioOutputSize: actual size of the outputBuffer
- *  @Return:
- *    - Pointer to the outputBuffer, nullptr if it failed
- *  @Throws:
- *    - gw2dt::exception::Exception or std::exception in case of error
- */
-uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,  uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
 
 /** @Inputs:
  *    - iWidth: Width of the texture
@@ -39,7 +24,6 @@ uint8_t* inflateTextureFileBuffer(uint32_t iInputSize, const uint8_t* iInputTab,
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
-        uint32_t& ioOutputSize, uint8_t* ioOutputTab = nullptr);
+void inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab);
 
 }
