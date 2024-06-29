@@ -1,10 +1,10 @@
 #pragma once
 
+#include <bit>
 #include <cassert>
 #include <concepts>
 #include <cstddef>
 #include <cstdint>
-#include <bit>
 
 namespace gw2::utils {
 

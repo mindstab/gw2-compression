@@ -1,8 +1,8 @@
 #pragma once
 
 #include <array>
-#include <cstdint>
 #include <concepts>
+#include <cstdint>
 
 #include "BitArray.hpp"
 

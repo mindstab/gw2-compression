@@ -5,12 +5,12 @@
 namespace gw2::compression {
 
 enum class Error {
-    kInputBufferIsEmpty,
-    kOutputBufferIsEmpty,
-    kOutputBufferTooSmall,
+  kInputBufferIsEmpty,
+  kOutputBufferIsEmpty,
+  kOutputBufferTooSmall,
 };
 
 template <typename T>
 using Result = std::expected<T, Error>;
 
-}
+}  // namespace gw2::compression
