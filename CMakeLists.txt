@@ -8,7 +8,6 @@ SET(INCLUDES
 
 SET(SOURCES
     src/gw2DatTools/compression/HuffmanTree.h
-    src/gw2DatTools/compression/HuffmanTree.i
     src/gw2DatTools/compression/huffmanTreeUtils.cpp
     src/gw2DatTools/compression/huffmanTreeUtils.h
     src/gw2DatTools/compression/inflateDatFileBuffer.cpp
