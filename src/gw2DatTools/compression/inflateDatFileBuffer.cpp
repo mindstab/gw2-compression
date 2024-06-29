@@ -196,7 +196,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, uint32_t iOutputSize,  uint8_
 }
 }
 
-void inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
+std::uint32_t inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
 {
     uint8_t* anOutputTab(nullptr);
     try
@@ -215,6 +215,7 @@ void inflateDatFileBuffer(std::span<const std::byte> iInputTab, std::span<std::b
         anOutputTab = (uint8_t*)ioOutputTab.data();
 
         dat::inflatedata(anInputBitArray, anOutputSize, anOutputTab);
+        return anOutputSize;
     }
     catch(std::exception& iException)
     {

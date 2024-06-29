@@ -634,83 +634,9 @@ void inflateData(State& iState, const FullFormat& iFullFormat, uint32_t ioOutput
 }
 }
 
-void inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
+std::uint32_t inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab)
 {
     uint8_t* anOutputTab(nullptr);
-
-    try
-    {
-        if (!texture::sStaticValuesInitialized)
-        {
-            texture::initializeStaticValues();
-            texture::sStaticValuesInitialized = true;
-        }
-
-        // Initialize state
-        State aState;
-        aState.input = std::bit_cast<const std::uint32_t*>(iInputTab.data());
-        aState.inputSize = iInputTab.size() / 4;
-        aState.inputPos = 0;
-
-        aState.head = 0;
-        aState.bits = 0;
-        aState.buffer = 0;
-
-        aState.isEmpty = false;
-
-        // Skipping header
-        needBits(aState, 32);
-        dropBits(aState, 32);
-
-        // Format
-        needBits(aState, 32);
-        uint32_t aFormatFourCc = readBits(aState, 32);
-        dropBits(aState, 32);
-
-        texture::FullFormat aFullFormat;
-
-        aFullFormat.format = texture::deduceFormat(aFormatFourCc);
-
-        // Getting width/height
-        needBits(aState, 32);
-        aFullFormat.width = readBits(aState, 16);
-        dropBits(aState, 16);
-        aFullFormat.height = readBits(aState, 16);
-        dropBits(aState, 16);
-
-        aFullFormat.nbObPixelBlocks = ((aFullFormat.width + 3) / 4) * ((aFullFormat.height + 3) / 4);
-        aFullFormat.bytesPerPixelBlock = (aFullFormat.format.pixelSizeInBits * 4 * 4) / 8;
-        aFullFormat.hasTwoComponents =
-            ((aFullFormat.format.flags & (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA)) == (texture::FF_PLAINCOMP | texture::FF_COLOR | texture::FF_ALPHA))
-            || (aFullFormat.format.flags & texture::FF_BICOLORCOMP);
-
-        aFullFormat.bytesPerComponent = aFullFormat.bytesPerPixelBlock / (aFullFormat.hasTwoComponents ? 2 : 1);
-
-        uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
-        anOutputTab = (uint8_t*)ioOutputTab.data();
-        texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);
-    }
-    catch(std::exception& iException)
-    {
-        throw iException; // Rethrow exception
-    }
-}
-
-uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t iFormatFourCc, uint32_t iInputSize, const uint8_t* iInputTab,
-        uint32_t& ioOutputSize, uint8_t* ioOutputTab)
-{
-    if (iInputTab == nullptr)
-    {
-        throw std::exception("Input buffer is null.");
-    }
-
-    if (ioOutputTab != nullptr && ioOutputSize == 0)
-    {
-        throw std::exception("Output buffer is not null and outputSize is not defined.");
-    }
-
-    uint8_t* anOutputTab(nullptr);
-    bool isOutputTabOwned(true);
 
     try
     {
@@ -737,8 +663,8 @@ uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t i
 
         // Initialize state
         State aState;
-        aState.input = reinterpret_cast<const uint32_t*>(iInputTab);
-        aState.inputSize = iInputSize / 4;
+        aState.input = std::bit_cast<const uint32_t*>(iInputTab.data());
+        aState.inputSize = iInputTab.size() / 4;
         aState.inputPos = 0;
 
         aState.head = 0;
@@ -747,36 +673,14 @@ uint8_t* inflateTextureBlockBuffer(uint16_t iWidth, uint16_t iHeight, uint32_t i
 
         aState.isEmpty = false;
 
-        // Allocate output buffer
         uint32_t anOutputSize = aFullFormat.bytesPerPixelBlock * aFullFormat.nbObPixelBlocks;
+        anOutputTab = (uint8_t*)ioOutputTab.data();        
 
-        if (ioOutputSize != 0 && ioOutputSize < anOutputSize)
-        {
-            throw std::exception("Output buffer is too small.");
-        }
-
-        ioOutputSize = anOutputSize;
-
-        if (ioOutputTab == nullptr)
-        {
-            anOutputTab = static_cast<uint8_t*>(malloc(sizeof(uint8_t) * anOutputSize));
-        }
-        else
-        {
-            isOutputTabOwned = false;
-            anOutputTab = ioOutputTab;
-        }
-
-        texture::inflateData(aState, aFullFormat, ioOutputSize, anOutputTab);
-
-        return anOutputTab;
+        texture::inflateData(aState, aFullFormat, anOutputSize, anOutputTab);
+        return anOutputSize;
     }
     catch(std::exception& iException)
     {
-        if (isOutputTabOwned)
-        {
-            free(anOutputTab);
-        }
         throw iException; // Rethrow exception
     }
 }

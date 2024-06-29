@@ -24,6 +24,6 @@ namespace gw2::compression
  *  @Throws:
  *    - gw2dt::exception::Exception or std::exception in case of error
  */
-void inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab);
+std::uint32_t inflateTextureBlockBuffer(std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc, std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab);
 
 }
