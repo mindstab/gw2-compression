@@ -176,8 +176,6 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,
 
 Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
                                            std::span<std::byte> ioOutputTab) {
-  uint8_t* anOutputTab(nullptr);
-
   if (iInputTab.empty()) {
     return std::unexpected{Error::kInputBufferIsEmpty};
   }
@@ -199,6 +197,28 @@ Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
   if (ioOutputTab.size() < anOutputSize) {
     return std::unexpected{Error::kOutputBufferTooSmall};
   }
+
+  dat::inflatedata(anInputBitArray, anOutputSize, ioOutputTab.data());
+  return anOutputSize;
+}
+
+Result<std::uint32_t> inflateDatFileBuffer(
+    std::span<const std::byte> iInputTab, std::vector<std::byte>& ioOutputTab) {
+  if (iInputTab.empty()) {
+    return std::unexpected{Error::kInputBufferIsEmpty};
+  }
+
+  dat::DatFileBitArray anInputBitArray(
+      iInputTab, 16384);  // Skipping four bytes every 65k chunk
+
+  // Skipping header & Getting size of the uncompressed data
+  anInputBitArray.drop<std::uint32_t>();
+
+  // Getting size of the uncompressed data
+  std::uint32_t anOutputSize;
+  anInputBitArray.read(anOutputSize);
+  anInputBitArray.drop<std::uint32_t>();
+  ioOutputTab.resize(anOutputSize);
 
   dat::inflatedata(anInputBitArray, anOutputSize, ioOutputTab.data());
   return anOutputSize;

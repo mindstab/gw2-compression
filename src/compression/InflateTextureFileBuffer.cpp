@@ -593,8 +593,6 @@ void inflateData(State& iState, const FullFormat& iFullFormat,
 Result<std::uint32_t> inflateTextureBlockBuffer(
     std::uint16_t iWidth, std::uint16_t iHeight, std::uint32_t iFormatFourCc,
     std::span<const std::byte> iInputTab, std::span<std::byte> ioOutputTab) {
-  uint8_t* anOutputTab(nullptr);
-
   if (iInputTab.empty()) {
     return std::unexpected{Error::kInputBufferIsEmpty};
   }

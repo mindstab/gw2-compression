@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <span>
+#include <vector>
 
 #include "Error.hpp"
 
@@ -16,5 +17,14 @@ namespace gw2::compression {
  */
 Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
                                            std::span<std::byte> ioOutputTab);
+
+/** @Inputs:
+ *    - iInputTab: Pointer to the buffer to inflate
+ *    - ioOutputTab: Output buffer
+ *  @Return:
+ *    - Actual size of the outputBuffer
+ */
+Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
+                                           std::vector<std::byte>& ioOutputTab);
 
 }  // namespace gw2::compression
