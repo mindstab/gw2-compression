@@ -127,9 +127,16 @@ class BitArray {
   void pull(IntType& oValue, std::uint8_t& oNbPulledBits) {
     if (_bytesAvail >= sizeof(IntType)) {
       if (_skippedBytes != 0) {
-        if ((((_pBufferPos - _pBufferStartPos) / sizeof(IntType)) + 1) %
-                _skippedBytes ==
-            0) {
+        if (_skippedBytes == 0xffff) {
+          auto distance = std::distance(_pBufferStartPos, _pBufferPos);
+          if (distance > 0 && ((distance + 12) % 0x10000 == 0)) {
+            _bytesAvail -= sizeof(IntType);
+            _pBufferPos += sizeof(IntType);
+          }
+        } else if (_pBufferPos != _pBufferStartPos &&
+                   (((_pBufferPos - _pBufferStartPos) / sizeof(IntType)) + 1) %
+                           _skippedBytes ==
+                       0) {
           _bytesAvail -= sizeof(IntType);
           _pBufferPos += sizeof(IntType);
         }

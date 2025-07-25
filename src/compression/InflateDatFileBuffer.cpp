@@ -67,6 +67,8 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,
                  std::byte* ioOutputTab) {
   std::uint32_t anOutputPos = 0;
 
+  std::uint8_t method;
+  ioInputBitArray.read<4>(method);
   // Reading the const write size addition value
   ioInputBitArray.drop<4>();
   std::uint16_t aWriteSizeConstAdd;
@@ -76,7 +78,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,
 
   // Declaring our HuffmanTrees
   DatFileHuffmanTree aHuffmanTreeSymbol;
-  DatFileHuffmanTree aHuffmanTreeCopy;
+  DatFileHuffmanTree aHuffmanTreeCopy;  // distance
 
   DatFileHuffmanTreeBuilder aHuffmanTreeBuilder;
 
@@ -101,7 +103,7 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,
       ++aCurrentCodeReadCount;
 
       // Reading next code
-      std::uint16_t aSymbol = 0;
+      std::uint16_t aSymbol;
       aHuffmanTreeSymbol.readCode(ioInputBitArray, aSymbol);
 
       if (aSymbol < 0x100) {
@@ -114,28 +116,27 @@ void inflatedata(DatFileBitArray& ioInputBitArray, std::uint32_t iOutputSize,
       // Reading the additional info to know the write size
       aSymbol -= 0x100;
 
+      constexpr auto write_count = std::array{
+          0,  1,  2,  3,  4,  5,  6,  7,  8,   10,  12,  14,  16,  20,  24,
+          28, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 255,
+      };
+      constexpr auto bit_count = std::array{
+          0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2,
+          2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0,
+      };
+
+      assert(aSymbol < 27);
+
+      std::uint16_t aWriteSize = write_count[aSymbol];
+      auto b = bit_count[aSymbol];
+      if (b > 0) {
+        std::uint32_t writeSizeAdd;
+        ioInputBitArray.read(b, writeSizeAdd);
+        aWriteSize |= writeSizeAdd;
+        ioInputBitArray.drop(b);
+      }
+
       // write size
-      std::div_t aCodeDiv4 = std::div(aSymbol, 4);
-
-      std::uint32_t aWriteSize = 0;
-      if (aCodeDiv4.quot == 0) {
-        aWriteSize = aSymbol;
-      } else if (aCodeDiv4.quot < 7) {
-        aWriteSize = ((1 << (aCodeDiv4.quot - 1)) * (4 + aCodeDiv4.rem));
-      } else if (aSymbol == 28) {
-        aWriteSize = 0xFF;
-      } else {
-        assert(false && "Invalid value for writeSize code.");
-      }
-
-      // additional bits
-      if (aCodeDiv4.quot > 1 && aSymbol != 28) {
-        std::uint8_t aWriteSizeAddBits = aCodeDiv4.quot - 1;
-        std::uint32_t aWriteSizeAdd;
-        ioInputBitArray.read(aWriteSizeAddBits, aWriteSizeAdd);
-        aWriteSize |= aWriteSizeAdd;
-        ioInputBitArray.drop(aWriteSizeAddBits);
-      }
       aWriteSize += aWriteSizeConstAdd;
 
       // write offset
@@ -185,43 +186,12 @@ Result<std::uint32_t> inflateDatFileBuffer(std::span<const std::byte> iInputTab,
   }
 
   dat::DatFileBitArray anInputBitArray(
-      iInputTab, 16384);  // Skipping four bytes every 65k chunk
+      iInputTab, 0xffff);  // Skipping four bytes every 65k chunk
 
-  // Skipping header & Getting size of the uncompressed data
-  anInputBitArray.drop<std::uint32_t>();
+  dat::inflatedata(anInputBitArray, ioOutputTab.size(), ioOutputTab.data());
+  anInputBitArray.drop<1>();
 
-  // Getting size of the uncompressed data
-  std::uint32_t anOutputSize;
-  anInputBitArray.read(anOutputSize);
-  anInputBitArray.drop<std::uint32_t>();
-  if (ioOutputTab.size() < anOutputSize) {
-    return std::unexpected{Error::kOutputBufferTooSmall};
-  }
-
-  dat::inflatedata(anInputBitArray, anOutputSize, ioOutputTab.data());
-  return anOutputSize;
-}
-
-Result<std::uint32_t> inflateDatFileBuffer(
-    std::span<const std::byte> iInputTab, std::vector<std::byte>& ioOutputTab) {
-  if (iInputTab.empty()) {
-    return std::unexpected{Error::kInputBufferIsEmpty};
-  }
-
-  dat::DatFileBitArray anInputBitArray(
-      iInputTab, 16384);  // Skipping four bytes every 65k chunk
-
-  // Skipping header & Getting size of the uncompressed data
-  anInputBitArray.drop<std::uint32_t>();
-
-  // Getting size of the uncompressed data
-  std::uint32_t anOutputSize;
-  anInputBitArray.read(anOutputSize);
-  anInputBitArray.drop<std::uint32_t>();
-  ioOutputTab.resize(anOutputSize);
-
-  dat::inflatedata(anInputBitArray, anOutputSize, ioOutputTab.data());
-  return anOutputSize;
+  return 0;
 }
 
 class DatFileHuffmanTreeDictStaticInitializer {
